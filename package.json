@@ -6,7 +6,7 @@
   "scripts": {
     "test": "karma start",
     "build": "tsc",
-    "dev": "ts-node-dev src/server.ts"
+    "dev": "node build/server.js"
   },
   "keywords": [],
   "author": "",
