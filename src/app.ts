@@ -13,7 +13,7 @@ class App {
 
   private middlewares(): void {
     this.express.use(express.json());
-    this.express.use(cors({origin: 'http://localhost:3000'}));
+    this.express.use(cors({origin: '*', optionsSuccessStatus: 200}));
     this.express.use(produtosRoutes);
     this.express.use(usuarioRoutes);
   }
