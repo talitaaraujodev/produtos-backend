@@ -13,9 +13,10 @@ class App {
 
   private middlewares(): void {
     this.express.use(express.json());
+    this.express.use(cors());
+    this.express.options('*', cors());
     this.express.use(produtosRoutes);
     this.express.use(usuarioRoutes);
-    this.express.use(cors());
   }
 
   private database(): void {
