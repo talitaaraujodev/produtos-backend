@@ -13,7 +13,7 @@ interface IRegisterUsuarioDTO {
 interface UsuarioRepository {
     saveUser({ nome, email, password }: IRegisterUsuarioDTO): Promise<Usuario>;
     auth({ email, password }: ILoginUsuarioDTO): Promise<any>;
-    findUserByEmail(email: string):Promise<Boolean>;
+    findUserByEmail(email: string):Promise<any>;
     passwordMatched(password: string, passwordHash: string): any;
 }
 export { UsuarioRepository, ILoginUsuarioDTO, IRegisterUsuarioDTO };

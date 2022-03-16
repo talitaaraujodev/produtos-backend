@@ -1,8 +1,9 @@
 import connection from "./database/connection";
 import express from "express";
 import cors from "cors";
-const produtosRoutes = require("./routes/produtos.routes");
-const usuarioRoutes = require("./routes/users.routes")
+const produtoRoutes = require("./routes/produto.routes");
+const usuarioRoutes = require("./routes/usuario.routes");
+const categoriaRoutes = require("./routes/categoria.routes");
 class App {
   private express: express.Application;
   public constructor() {
@@ -14,8 +15,9 @@ class App {
   private middlewares(): void {
     this.express.use(express.json());
     this.express.use(cors({origin: '*', optionsSuccessStatus: 200}));
-    this.express.use(produtosRoutes);
+    this.express.use(produtoRoutes);
     this.express.use(usuarioRoutes);
+    this.express.use(categoriaRoutes);
   }
 
   private database(): void {

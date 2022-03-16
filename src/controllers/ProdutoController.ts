@@ -1,11 +1,17 @@
 import { Request, Response } from "express";
-import produtosService from "../services/ProdutosService";
+import produtoService from "../services/ProdutoService";
 import { Const } from "../utils/const";
 class ProdutosController {
   async create(req: Request, res: Response): Promise<Response> {
     try {
-      const { nome, descricao, preco } = req.body;
-      const produto = await produtosService.create({ nome, descricao, preco });
+ 
+      const { nome, descricao, preco, categoria_id } = req.body;
+      const produto = await produtoService.create({
+        nome,
+        descricao,
+        preco,
+        categoria_id,
+      });
       return res.status(Const.httpStatus.CREATED).json({
         message: "Produto criado com sucesso.",
         produto: produto,
@@ -15,7 +21,7 @@ class ProdutosController {
     }
   }
   async listing(req: Request, res: Response): Promise<Response> {
-    const getProdutos = await produtosService.listing();
+    const getProdutos = await produtoService.listing();
     try {
       return res.status(Const.httpStatus.OK).json(getProdutos);
     } catch (error) {
@@ -25,7 +31,7 @@ class ProdutosController {
   async getById(req: Request, res: Response): Promise<Response> {
     try {
       const id = parseInt(req.params.id);
-      const produto = await produtosService.getById(id);
+      const produto = await produtoService.getById(id);
       return res.status(Const.httpStatus.OK).json(produto);
     } catch (error) {
       return res.status(error.status).json(error);
@@ -34,7 +40,7 @@ class ProdutosController {
   async delete(req: Request, res: Response): Promise<Response> {
     try {
       const id = parseInt(req.params.id);
-      await produtosService.delete(id);
+      await produtoService.delete(id);
       return res.status(Const.httpStatus.OK).json({
         message: "Produto deletado com sucesso.",
       });
@@ -43,13 +49,14 @@ class ProdutosController {
     }
   }
   async update(req: Request, res: Response): Promise<Response> {
-    const { id, nome, descricao, preco } = req.body;
+    const { id, nome, descricao, preco, categoria_id } = req.body;
     try {
-      await produtosService.update({
+      await produtoService.update({
         id,
         nome,
         descricao,
         preco,
+        categoria_id,
       });
 
       return res.json({

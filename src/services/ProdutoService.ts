@@ -3,26 +3,44 @@ import validate from "../validators/validate";
 import produtoValidador from "../validators/produtoValidator";
 import { Const } from "../utils/const";
 import { ProdutoRepository } from "../repositories/ProdutoRepository";
+import { CategoriaRepository } from "../repositories/CategoriaRepository";
 import { Produto } from "../models/Produto";
-import ProdutosRepositoryImp from "../repositories/ProdutosRepositoryImp";
+import ProdutoRepositoryImp from "../repositories/ProdutoRepositoryImp";
+import CategoriaRepositoryImp from "../repositories/CategoriaRepositoryImp";
 
 interface IRequest {
   id?: number;
   nome: string;
   descricao: string;
   preco: string;
+  categoria_id: number;
 }
-
-class ProdutosService {
-  constructor(private produtosRepository: ProdutoRepository) {}
-  async create({ nome, preco, descricao }: IRequest): Promise<Produto> {
-    const produtoExists = await this.produtosRepository.findProdutoByName(nome);
-    const body = { nome, preco, descricao };
+class ProdutoService {
+  constructor(
+    private produtosRepository: ProdutoRepository,
+    private categoriaRepository: CategoriaRepository
+  ) {}
+  async create({
+    nome,
+    preco,
+    descricao,
+    categoria_id,
+  }: IRequest): Promise<Produto> {
+    const produtoAlreadyExists =
+      await this.produtosRepository.findProdutoByName(nome);
+    const categoriaAlreadyExists =
+      await this.categoriaRepository.findCategoriaById(categoria_id);
+    const body = { nome, preco, descricao, categoria_id };
     const data = await validate(produtoValidador, body);
 
-    if (produtoExists) {
+    if (produtoAlreadyExists) {
       throw new ResponseError(
         "Produto já existe.",
+        Const.httpStatus.BAD_REQUEST
+      );
+    } else if (!categoriaAlreadyExists) {
+      throw new ResponseError(
+        "Categoria não existe",
         Const.httpStatus.BAD_REQUEST
       );
     } else if (data.errors) {
@@ -39,8 +57,11 @@ class ProdutosService {
     }
   }
   async getById(id: number): Promise<Produto> {
-    const produtoExist = await this.produtosRepository.verificationById(id);
-    if (produtoExist) {
+    const produtoAlreadyExists = await this.produtosRepository.findProdutoById(
+      id
+    );
+
+    if (!produtoAlreadyExists) {
       throw new ResponseError(
         "Produto não encontrado.",
         Const.httpStatus.BAD_REQUEST
@@ -49,11 +70,19 @@ class ProdutosService {
       return await this.produtosRepository.getById(id);
     }
   }
-  async update({ id, nome, descricao, preco }: IRequest): Promise<Produto> {
-    const body = { nome, preco, descricao };
-    const produtoExists = await this.produtosRepository.verificationById(id);
+  async update({
+    id,
+    nome,
+    descricao,
+    preco,
+    categoria_id,
+  }: IRequest): Promise<Produto> {
+    const body = { nome, preco, descricao, categoria_id };
+    const produtoAlreadyExists = await this.produtosRepository.findProdutoById(
+      id
+    );
     const data = await validate(produtoValidador, body);
-    if (produtoExists) {
+    if (!produtoAlreadyExists) {
       throw new ResponseError(
         "Produto não encontrado",
         Const.httpStatus.BAD_REQUEST
@@ -65,8 +94,10 @@ class ProdutosService {
     }
   }
   async delete(id: number): Promise<Produto> {
-    const produtoExist = await this.produtosRepository.verificationById(id);
-    if (produtoExist) {
+    const produtoAlreadyExists = await this.produtosRepository.findProdutoById(
+      id
+    );
+    if (!produtoAlreadyExists) {
       throw new ResponseError(
         "Produto não encontrado.",
         Const.httpStatus.BAD_REQUEST
@@ -77,4 +108,4 @@ class ProdutosService {
   }
 }
 
-export default new ProdutosService(ProdutosRepositoryImp);
+export default new ProdutoService(ProdutoRepositoryImp, CategoriaRepositoryImp);

@@ -1,13 +1,13 @@
 import { Usuario } from "../models/Usuario";
 import { UsuarioRepository } from "./UsuarioRepository";
 import connect from "../database/connection";
-import { sign } from 'jsonwebtoken'
-import auth from '../auth/auth'
+import { sign } from "jsonwebtoken";
+import auth from "../auth/auth";
 import { compareSync } from "bcryptjs";
 import ResponseError from "../errors/ResponseError";
 
 class UsuarioRepositoryImp implements UsuarioRepository {
-  constructor() { }
+  constructor() {}
   public saveUser({ nome, email, password }): Promise<Usuario> {
     const user: Usuario = { nome, email, password };
 
@@ -17,7 +17,7 @@ class UsuarioRepositoryImp implements UsuarioRepository {
           return accept(user);
         } catch {
           if (error) {
-            return reject("Erro ao salvar usu·rio" + error);
+            return reject("Erro ao salvar usu√°rio" + error);
           }
         }
       });
@@ -28,21 +28,29 @@ class UsuarioRepositoryImp implements UsuarioRepository {
     return new Promise((accept, reject) => {
       connect.query(
         `SELECT email, password FROM usuario where email='${email}'`,
-       async (error, result) => {
+        async (error, result) => {
           try {
-            if(result.length != 0){
+            if (result.length != 0) {
               const hashPassword = result[0]["password"];
-              const passwordMatched = await this.passwordMatched(password, hashPassword);
-                if (passwordMatched) {
-                  const token = sign({
+              const passwordMatched = await this.passwordMatched(
+                password,
+                hashPassword
+              );
+              if (passwordMatched) {
+                const token = sign(
+                  {
                     subject: result[0].id,
-                    expiresIn: auth.jwt.expiresIn
-                  }, auth.jwt.secret);
-                  console.log(token)
-                  return accept({ token: token });
-                }
+                    expiresIn: auth.jwt.expiresIn,
+                  },
+                  auth.jwt.secret
+                );
+                console.log(token);
+                return accept({ token: token });
+              }
             }
-            return reject(new ResponseError( "Usuario e/ou senha inv·lidos." , 400));
+            return reject(
+              new ResponseError("Usuario e/ou senha inv√°lidos.", 400)
+            );
           } catch (erro) {
             return reject(erro);
           }
@@ -50,7 +58,7 @@ class UsuarioRepositoryImp implements UsuarioRepository {
       );
     });
   }
-  public findUserByEmail(email: string): Promise<Boolean> {
+  public findUserByEmail(email: string): Promise<any> {
     return new Promise((accept, reject) => {
       connect.query(
         `SELECT * FROM usuario WHERE email='${email}'`,
@@ -71,12 +79,11 @@ class UsuarioRepositoryImp implements UsuarioRepository {
     });
   }
   public passwordMatched(password: string, passwordHash: string): any {
-      try {       
-     return compareSync(password, passwordHash);       
-      } catch (erro) {
-       console.log(erro);
-      }
-
+    try {
+      return compareSync(password, passwordHash);
+    } catch (erro) {
+      console.log(erro);
+    }
   }
 }
 

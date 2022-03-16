@@ -20,17 +20,20 @@ interface IRequestLogin {
 }
 
 class UsuarioService {
-  constructor(private usuarioRepository: UsuarioRepository) { }
+  constructor(private usuarioRepository: UsuarioRepository) {}
+
   async register({
     nome,
     email,
     password,
   }: IRequestRegister): Promise<Usuario> {
-    const emailExists = await this.usuarioRepository.findUserByEmail(email);
+    const emailAlreadyExists = await this.usuarioRepository.findUserByEmail(
+      email
+    );
     const body = { nome, email, password };
     const data = await validate(registerValidador, body);
-    console.log(emailExists);
-    if (emailExists) {
+
+    if (emailAlreadyExists) {
       throw new ResponseError(
         "Usuário já possui cadastro.",
         Const.httpStatus.BAD_REQUEST
@@ -45,11 +48,9 @@ class UsuarioService {
   }
   async login(body: IRequestLogin): Promise<Usuario> {
     const data = await validate(loginValidador, body);
-
     if (data.errors) {
       throw new ResponseError(data.errors, Const.httpStatus.BAD_REQUEST);
     }
-
     return await this.usuarioRepository.auth(body);
   }
 }

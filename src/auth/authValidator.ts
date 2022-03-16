@@ -5,7 +5,6 @@ import auth from './auth';
 import ResponseError from '../errors/ResponseError';
 
 function authValidator (request: Request, response: Response, next : NextFunction) {
-  console.log("aqui")
   const authHeader = (request.headers.authorization || '')
   const status = Const.httpStatus.UNATHORIZED
   if (!authHeader) {
