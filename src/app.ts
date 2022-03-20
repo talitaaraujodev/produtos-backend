@@ -13,8 +13,8 @@ class App {
   }
 
   private middlewares(): void {
+    this.express.use(cors());
     this.express.use(express.json());
-    this.express.use(cors({origin: '*', optionsSuccessStatus: 200}));
     this.express.use(produtoRoutes);
     this.express.use(usuarioRoutes);
     this.express.use(categoriaRoutes);
